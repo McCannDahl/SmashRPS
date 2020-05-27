@@ -9,6 +9,8 @@ port = 54545
 
 serversocket.bind(('', port))
 
+print('listening')
+
 serversocket.listen(1)
 
 clientsocket,addr = serversocket.accept()
