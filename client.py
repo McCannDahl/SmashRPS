@@ -1,7 +1,6 @@
 from threading import Thread
 import socket
 import sys
-import time
 import pygame
 from pages.page import Page
 from pages.connect import Connect
@@ -19,13 +18,15 @@ class Display:
 
     def __init__(self):
         pygame.init()
+        pygame.font.init()
         self.screen = pygame.display.set_mode((640, 480))
         self.clock = pygame.time.Clock()
         # add pages
-        self.pages.append(Connect(self.screen))
+        self.pages.append(Connect(self.screen, self.action))
         self.current_page: Page = self.pages[0]
     
     def start(self):
+        print("start display")
         while True:
             self.handle_inputs()
             self.render()
@@ -47,9 +48,15 @@ class Display:
                     self.current_page.handle_mouse_event(position)
 
     def render(self):
-        self.screen.fill((0, 0, 0))
+        self.screen.fill((255, 255, 255))
         if self.current_page != None:
             self.current_page.render()
+        pygame.display.flip()
+
+    def action(self,data):
+        if data['title'] == 'join':
+            print(data['ip'])
+            # todo change pages
 
 class Socket:
     def __init__(self,host="localhost",port=54545):

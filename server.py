@@ -1,6 +1,5 @@
 import socket
 import time
-import sys
 from threading import Thread
 
 serversocket = socket.socket()
@@ -14,28 +13,42 @@ serversocket.bind(('', port))
 print('listening ("conrol + c" to stop)')
 
 serversocket.listen()
-def get_client_data():
+
+def listen_for_connections():
     while True:
         clientsocket,addr = serversocket.accept()
         print("got a connection from %s" % str(addr))
         clientsockets.append(clientsocket)
 
-def update_game():
+def update_state():
+    new_time = time.time()
+    while True:
+        old_time = time.time()
+        t = old_time - new_time
+        new_time = old_time
+        # update state
+        time.sleep(0.01)
+
+def send_state():
     while True:
         for c in clientsockets:
             try:
-                c.send('update'.encode('ascii'))
+                pass
+                #c.send('update'.encode('ascii'))
             except:
-                print('could not send update')
+                print('removing client')
                 clientsockets.remove(c)
-        time.sleep(1)
+        time.sleep(0.01)
 
 if __name__ == '__main__':
-    t1 = Thread(target=get_client_data)
+    t1 = Thread(target=listen_for_connections)
     t1.daemon = True
-    t2 = Thread(target=update_game)
+    t2 = Thread(target=update_state)
     t2.daemon = True
+    t3 = Thread(target=send_state)
+    t3.daemon = True
     t1.start()
     t2.start()
+    t3.start()
     while True:
         time.sleep(10)

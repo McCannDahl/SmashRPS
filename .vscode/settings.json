@@ -1,3 +1,6 @@
 {
-    "python.pythonPath": "/Users/mccanndahl/opt/anaconda3/bin/python"
+    "python.pythonPath": "C:\\Users\\mccda\\anaconda3\\envs\\SmashRPS\\python.exe",
+    "python.linting.pylintArgs": [
+        "--extension-pkg-whitelist=pygame"  // The extension is "lxml" not "1xml"
+    ]
 }
