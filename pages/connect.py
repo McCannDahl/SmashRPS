@@ -1,5 +1,6 @@
 from pages.page import Page
 import pygame
+import random
 
 class Connect(Page):
     def __init__(self, s, a):
@@ -12,6 +13,7 @@ class Connect(Page):
         self.button_y = 150
         self.button_width = 80
         self.button_height = 50
+        self.button_clicked = False
 
     def handle_keydown(self, key):
         key_string = pygame.key.name(key)
@@ -24,7 +26,9 @@ class Connect(Page):
     def handle_mouse_event(self, position):
         x, y = position
         if x >= self.button_x and x <= self.button_x + self.button_width and y >= self.button_y and y <= self.button_y + self.button_height:
-            self.action({'title': 'join', 'ip': self.ipaddress})
+            if not self.button_clicked:
+                self.action({'title': 'join', 'ip': self.ipaddress})
+                self.button_clicked = True
 
     def render(self):
         textsurface = self.title_font.render('Enter the server IP address', False, (0, 0, 0))
@@ -35,4 +39,9 @@ class Connect(Page):
 
         pygame.draw.rect(self.screen, (100, 100, 180), (self.button_x, self.button_y, self.button_width, self.button_height), 2)
         textsurface = self.title_font.render('Join', False, (100, 100, 180))
+        if self.button_clicked:
+            textsurface = self.title_font.render(str(random.randint(1, 1000)), False, (100, 180, 100))
         self.screen.blit(textsurface, (60, 160))
+    
+    def restart(self):
+        self.button_clicked = False
