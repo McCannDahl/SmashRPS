@@ -19,8 +19,10 @@ class Error(Page):
 
     def render(self):
         textsurface = self.title_font.render('ERROR', False, (180, 0, 0))
-        self.screen.blit(textsurface, (50, 50))
+        self.screen.blit(textsurface, (self.screen_w/2 - 50, 50))
 
+        self.button_x = self.screen_w/2 - 45
         pygame.draw.rect(self.screen, (100, 100, 180), (self.button_x, self.button_y, self.button_width, self.button_height), 2)
+        
         textsurface = self.title_font.render('Home', False, (100, 100, 180))
-        self.screen.blit(textsurface, (60, 160))
+        self.screen.blit(textsurface, (self.screen_w/2 - 35, 160))

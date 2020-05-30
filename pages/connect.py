@@ -32,16 +32,18 @@ class Connect(Page):
 
     def render(self):
         textsurface = self.title_font.render('Enter the server IP address', False, (0, 0, 0))
-        self.screen.blit(textsurface, (50, 50))
+        self.screen.blit(textsurface, (self.screen_w/2 - 180, 50))
 
         textsurface = self.ipadress_font.render(self.ipaddress, False, (0, 0, 0))
-        self.screen.blit(textsurface, (50, 100))
+        self.screen.blit(textsurface, (self.screen_w/2 - len(self.ipaddress)*5, 100))
 
+        self.button_x = self.screen_w/2 - 40
         pygame.draw.rect(self.screen, (100, 100, 180), (self.button_x, self.button_y, self.button_width, self.button_height), 2)
+        
         textsurface = self.title_font.render('Join', False, (100, 100, 180))
         if self.button_clicked:
             textsurface = self.title_font.render(str(random.randint(1, 1000)), False, (100, 180, 100))
-        self.screen.blit(textsurface, (60, 160))
+        self.screen.blit(textsurface, (self.screen_w/2 - 30, 160))
     
     def restart(self):
         self.button_clicked = False

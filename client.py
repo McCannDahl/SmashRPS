@@ -20,7 +20,7 @@ class Display:
     def __init__(self):
         pygame.init()
         pygame.font.init()
-        self.screen = pygame.display.set_mode((640, 480))
+        self.screen = pygame.display.set_mode((640, 480), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
         # add pages
         self.pages.append(Connect(self.screen, self.action))
@@ -29,7 +29,13 @@ class Display:
         self.current_page: Page = self.pages[0]
         self.socket = Socket()
         self.ip = ''
-    
+        self.screen_size = pygame.display.get_surface().get_size()
+        self.set_all_pages_screen_sizes()
+
+    def set_all_pages_screen_sizes(self):
+        for p in self.pages:
+            p.set_screen_size(self.screen_size)
+
     def start(self):
         print("start display")
         while True:
@@ -42,6 +48,11 @@ class Display:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+                
+            if event.type == pygame.VIDEORESIZE:
+                self.screen_size = event.size
+                self.set_all_pages_screen_sizes()
+                screen = pygame.display.set_mode(self.screen_size, pygame.RESIZABLE)
 
             if event.type == pygame.KEYDOWN:
                 if self.current_page != None:
