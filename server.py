@@ -3,17 +3,19 @@ from threading import Thread
 import json
 import socket
 from helpers.player import Player
+from helpers.socket import Socket
+from helpers.rec import Rec
 
 serversocket = socket.socket()
-host = 'localhost'
+host = ''
 port = 54545
-t1 = None
-t2 = None
 players = []  # array of player colors, postions, attacks, health
+walls = [
+    Rec(0, 0, 100, 100)
+]
 
-serversocket.bind(('', port))
+serversocket.bind((host, port))
 print('listening ("conrol + c" to stop)')
-
 serversocket.listen()
 
 def listen_for_connections():
@@ -21,8 +23,12 @@ def listen_for_connections():
         clientsocket, addr = serversocket.accept()
         print("got a connection from %s" % str(addr))
         player_id = len(players)+1
-        players.append(Player(clientsocket, player_id))
-        Thread(target=get_data, args=[player_id], kwargs=None, daemon=True).start()
+        players.append(Player(clientsocket, player_id, disconnected))
+
+def disconnected(player):
+    if player in players:
+        print('Removing player '+str(player.name))
+        players.remove(player)
 
 def update():
     new_time = time.time()
@@ -34,7 +40,39 @@ def update():
         time.sleep(0.01)
 
 def update_state(t):
-    pass
+    # go through players and update all states
+    for p in players:
+        p.update(t)
+    # handle player collisions
+    for p in players:
+        for q in players:
+            if p != q:
+                handle_player_collision(p, q)
+    # handle wall collisions
+    for wall in walls:
+        for p in players:
+            handle_wall_collision(wall, p)
+
+def handle_player_collision(p, q): # only account for p. Move 1/2 the amount.
+    if p.velY < 0:
+        pass
+    elif p.velY > 0:
+        pass
+    if p.velX < 0:
+        pass
+    elif p.velX > 0:
+        pass
+
+def handle_wall_collision(wall, p):
+    if p.velY < 0: # going up
+        if p.y < wall.y + wall.h and p.y > wall.y:
+            p.y = wall.y + wall.h
+    elif p.velY > 0: # going down
+        pass
+    if p.velX < 0: # going left
+        pass
+    elif p.velX > 0: # going right
+        pass
 
 def get_data_to_send_to_client(p):
     return p.get_data_to_send_to_client()
@@ -45,49 +83,17 @@ def send_state():
         for p in players:
             try:
                 message = {'title':'update state', 'data':simple_players} # for now lets just send the players instead of state
-                messagestr = '<<<'+json.dumps(message)+'>>>'
-                p.sock.send(messagestr.encode('ascii'))
+                p.sock.send(message)
             except Exception as err:
                 print(err)
                 print('removing client')
-                players.remove(p)
+                disconnected(p)
         time.sleep(0.01)
 
-
-def get_data(player_id):
-    player = None
-    for p in players:
-        if p.id == player_id:
-            player = p
-    while p in players:
-        try:
-            teststr = player.sock.recv(1024).decode("utf-8")
-            if teststr.endswith('>>>'): # last message is complete
-                teststr = teststr.split("<<<")[-1]
-            else: # last message is incomplete
-                teststr = teststr.split("<<<")[-2]
-            teststr = teststr.replace('>>>','')
-            # print(teststr)
-            test = json.loads(teststr)
-            got_data(player, test)
-        except Exception as err:
-            print('There was a problem getting client data. Closing socket. '+str(err))
-            player.sock.close()
-            players.remove(player)
-
-def got_data(player, data):
-    if data['title'] == 'update name':
-        player.name = data['data']
-
 if __name__ == '__main__':
-    t1 = Thread(target=listen_for_connections)
-    t1.daemon = True
-    t2 = Thread(target=update)
-    t2.daemon = True
-    t3 = Thread(target=send_state)
-    t3.daemon = True
-    t1.start()
-    t2.start()
-    t3.start()
+    Thread(target=listen_for_connections, args=[], kwargs=None, daemon=True).start()
+    Thread(target=update, args=[], kwargs=None, daemon=True).start()
+    Thread(target=send_state, args=[], kwargs=None, daemon=True).start()
     while True:
         time.sleep(10)
+

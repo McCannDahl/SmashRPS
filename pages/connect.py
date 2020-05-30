@@ -8,7 +8,7 @@ class Connect(Page):
         self.action = a
         self.title_font = pygame.font.SysFont('arial', 30)
         self.ipadress_font = pygame.font.SysFont('arial', 20)
-        self.ipaddress = ''
+        self.ipaddress = '127.0.0.1'
         self.button_x = 50
         self.button_y = 150
         self.button_width = 80

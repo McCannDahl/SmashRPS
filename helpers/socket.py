@@ -6,10 +6,16 @@ import json
 class Socket:
     isconnected = False
 
-    def __init__(self, got_data, action):
-        self.sock = socket.socket()
+    def __init__(self, got_data, disconnected, sock=None):
         self.got_data = got_data
-        self.action = action
+        self.disconnected = disconnected
+        if sock == None:
+            self.sock = socket.socket()
+            self.isconnected = False
+        else:
+            self.isconnected = True
+            self.sock = sock
+            self.start_listening()
 
     def connect(self, host="localhost", port=54545):
         try:
@@ -20,12 +26,10 @@ class Socket:
             print('server not active')
             self.isconnected = False
     
-    def start(self):
-        self.t1 = Thread(target=self.get_data)
-        self.t1.daemon = True
-        self.t1.start()
+    def start_listening(self):
+        Thread(target=self.get_data, args=[], kwargs=None, daemon=True).start()
 
-    def send_data_to_server(self, data):
+    def send_data(self, data):
         Thread(target=self.send, args=[data], kwargs=None, daemon=True).start()
 
     def send(self, data):
@@ -48,6 +52,4 @@ class Socket:
                 print('There was a problem getting server data. Closing socket. '+str(err))
                 self.sock.close()
                 self.isconnected = False
-                self.action({
-                    'title': 'home'
-                })
+                self.disconnected()

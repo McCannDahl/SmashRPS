@@ -15,15 +15,22 @@ class Lobby(Page):
 
     def handle_keydown(self, key):
         key_string = pygame.key.name(key)
-        if key_string == 'backspace':
-            self.name = self.name[:-1]
+        if key_string == 'up':
+            self.action({
+                'title': 'jump'
+            })
         else:
-            self.name += key_string
-        print(self.name)
-        self.action({
-            'title': 'update name',
-            'data': self.name
-        })
+            if key_string == 'backspace':
+                self.name = self.name[:-1]
+            elif key_string == 'space':
+                self.name += ' '
+            else:
+                self.name += key_string
+            print(self.name)
+            self.action({
+                'title': 'update name',
+                'data': self.name
+            })
 
     def handle_mouse_event(self, position):
         x, y = position
@@ -38,14 +45,20 @@ class Lobby(Page):
         y += 60
         
         for p in self.state:
+            pygame.draw.rect(
+                self.screen, 
+                (p['color'][0], p['color'][1], p['color'][2]), 
+                (self.screen_w/2 - 60 - p['width'], y + p['y'], p['width'], p['height'])
+            )
+            
             textsurface = self.name_font.render(p['name'], False, (0, 0, 0))
             self.screen.blit(textsurface, (self.screen_w/2 - 50, y))
             y += 50
 
-        self.button_x = self.screen_w/2 - 75
+        self.button_x = self.screen_w/2 - 105
         self.button_y = y
         pygame.draw.rect(self.screen, (60, 120, 120), (self.button_x, self.button_y, self.button_width, self.button_height), 2)
         y += 5
 
         textsurface = self.title_font.render('Start Game', False, (60, 180, 180))
-        self.screen.blit(textsurface, (self.screen_w/2 - 70, y + 5))
+        self.screen.blit(textsurface, (self.screen_w/2 - 100, y + 5))
