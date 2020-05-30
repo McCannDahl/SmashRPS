@@ -10,16 +10,20 @@ class Lobby(Page):
         self.name = ''
         self.button_x = 50
         self.button_y = 150
-        self.button_width = 80
+        self.button_width = 160
         self.button_height = 50
 
     def handle_keydown(self, key):
         key_string = pygame.key.name(key)
-        if key_string == '.' or key_string == '1' or key_string == '2' or key_string == '3' or key_string == '4' or key_string == '5' or key_string == '6' or key_string == '7' or key_string == '8' or key_string == '9' or key_string == '0':
-            self.name += key_string
         if key_string == 'backspace':
             self.name = self.name[:-1]
+        else:
+            self.name += key_string
         print(self.name)
+        self.action({
+            'title': 'update name',
+            'data': self.name
+        })
 
     def handle_mouse_event(self, position):
         x, y = position
@@ -27,12 +31,21 @@ class Lobby(Page):
             self.action({'title': 'ready to start', 'name': self.name})
 
     def render(self):
+        y = 50
+
         textsurface = self.title_font.render('Enter you\'re name', False, (0, 0, 0))
-        self.screen.blit(textsurface, (50, 50))
+        self.screen.blit(textsurface, (self.screen_w/2 - 150, y))
+        y += 60
+        
+        for p in self.state:
+            textsurface = self.name_font.render(p['name'], False, (0, 0, 0))
+            self.screen.blit(textsurface, (self.screen_w/2 - 50, y))
+            y += 50
 
-        textsurface = self.name_font.render(self.name, False, (0, 0, 0))
-        self.screen.blit(textsurface, (50, 100))
+        self.button_x = self.screen_w/2 - 75
+        self.button_y = y
+        pygame.draw.rect(self.screen, (60, 120, 120), (self.button_x, self.button_y, self.button_width, self.button_height), 2)
+        y += 5
 
-        pygame.draw.rect(self.screen, (100, 100, 180), (self.button_x, self.button_y, self.button_width, self.button_height), 2)
-        textsurface = self.title_font.render('Join', False, (100, 100, 180))
-        self.screen.blit(textsurface, (60, 160))
+        textsurface = self.title_font.render('Start Game', False, (60, 180, 180))
+        self.screen.blit(textsurface, (self.screen_w/2 - 70, y + 5))

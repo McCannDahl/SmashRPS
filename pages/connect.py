@@ -27,7 +27,7 @@ class Connect(Page):
         x, y = position
         if x >= self.button_x and x <= self.button_x + self.button_width and y >= self.button_y and y <= self.button_y + self.button_height:
             if not self.button_clicked:
-                self.action({'title': 'join', 'ip': self.ipaddress})
+                self.action({'title': 'join', 'data': self.ipaddress})
                 self.button_clicked = True
 
     def render(self):

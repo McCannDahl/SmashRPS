@@ -6,6 +6,7 @@ from pages.connect import Connect
 from pages.lobby import Lobby
 from pages.error import Error
 from helpers.socket import Socket
+import json
 
 
 class Game:
@@ -27,7 +28,7 @@ class Display:
         self.pages.append(Lobby(self.screen, self.action))
         self.pages.append(Error(self.screen, self.action))
         self.current_page: Page = self.pages[0]
-        self.socket = Socket()
+        self.socket = Socket(self.got_data, self.action)
         self.ip = ''
         self.screen_size = pygame.display.get_surface().get_size()
         self.set_all_pages_screen_sizes()
@@ -52,7 +53,7 @@ class Display:
             if event.type == pygame.VIDEORESIZE:
                 self.screen_size = event.size
                 self.set_all_pages_screen_sizes()
-                screen = pygame.display.set_mode(self.screen_size, pygame.RESIZABLE)
+                self.screen = pygame.display.set_mode(self.screen_size, pygame.RESIZABLE)
 
             if event.type == pygame.KEYDOWN:
                 if self.current_page != None:
@@ -69,16 +70,22 @@ class Display:
             self.current_page.render()
         pygame.display.flip()
 
-    def action(self,data):
+    def action(self, data):
         if data['title'] == 'join':
-            print(data['ip'])
-            self.ip = data['ip']
+            print(data['data'])
+            self.ip = data['data']
             t1 = Thread(target=self.join)
             t1.daemon = True
             t1.start()
         elif data['title'] == 'home':
             self.current_page = self.pages[0] # home
             self.current_page.restart()
+        elif data['title'] == 'update name':
+            self.socket.send_data_to_server(data)
+    
+    def got_data(self, data):
+        if data['title'] == 'update state':
+            self.current_page.update_state(data['data'])
     
     def join(self):
         self.socket.connect(self.ip)
