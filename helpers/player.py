@@ -1,5 +1,6 @@
 
 from helpers.socket import Socket
+from helpers.constants import *
 
 class Player:
     sock = None
@@ -16,24 +17,12 @@ class Player:
     h = 20
     health = 100
 
-    # todo put this somewhere else
-    colors = [
-        [0,0,0],
-        [255,0,0],
-        [255,127,0],
-        [255,255,0],
-        [0,255,0],
-        [0,0,255],
-        [75,0,130],
-        [148,0,211]
-    ]
-
     def __init__(self, sock, player_num, server_disconnected):
         self.sock = Socket(self.got_data, self.disconnected, sock)
         self.id = player_num
         self.name = 'Player '+str(self.id)
         if self.id < 8:
-            self.color = self.colors[self.id]
+            self.color = colors[self.id]
         self.server_disconnected = server_disconnected
 
     def disconnected(self):
@@ -42,11 +31,17 @@ class Player:
     def got_data(self, data):
         if data['title'] == 'update name':
             self.name = data['data']
-        if data['title'] == 'jump':
+        elif data['title'] == 'jump':
             self.jump()
+        elif data['title'] == 'change color':
+            color_index = colors.index(self.color)
+            color_index += 1
+            if color_index >= len(colors):
+                color_index = 0
+            self.color = colors[color_index]
 
     def jump(self):
-        self.velY = -10
+        self.velY = jump_speed * -1
 
     def set_attack(self):
         pass
@@ -57,7 +52,7 @@ class Player:
         self.update_attack(t)
     
     def fall(self, t):
-        self.velY += 9.81 * t
+        self.velY += gravity * t
     
     def update_positions(self, t):
         self.x += self.velX * t

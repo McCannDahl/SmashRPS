@@ -65,14 +65,33 @@ def handle_player_collision(p, q): # only account for p. Move 1/2 the amount.
 
 def handle_wall_collision(wall, p):
     if p.velY < 0: # going up
-        if p.y < wall.y + wall.h and p.y > wall.y:
+        if (
+            (p.y <= wall.y + wall.h and p.y >= wall.y) or # assumming wall is taller than person
+            (wall.y + wall.h <= p.y + p.h and wall.y + wall.h >= p.y)
+        ): # assuming person is taller than wall
             p.y = wall.y + wall.h
+            p.velY = 0
     elif p.velY > 0: # going down
-        pass
+        if (
+            (p.y + p.h <= wall.y + wall.h and p.y + p.h >= wall.y) or # assumming wall is taller than person
+            (wall.y <= p.y + p.h and wall.y >= p.y)
+        ): # assuming person is taller than wall
+            p.y = wall.y - p.h
+            p.velY = 0
     if p.velX < 0: # going left
-        pass
+        if (
+            (p.x <= wall.x + wall.w and p.x >= wall.x) or # assumming wall is taller than person
+            (wall.x + wall.w <= p.x + p.w and wall.x + wall.w >= p.x)
+        ): # assuming person is taller than wall
+            p.x = wall.x + wall.w
+            p.velX = 0
     elif p.velX > 0: # going right
-        pass
+        if (
+            (p.x + p.w <= wall.x + wall.w and p.x + p.w >= wall.x) or # assumming wall is taller than person
+            (wall.x <= p.x + p.w and wall.x >= p.x)
+        ): # assuming person is taller than wall
+            p.x = wall.x - p.w
+            p.velX = 0
 
 def get_data_to_send_to_client(p):
     return p.get_data_to_send_to_client()

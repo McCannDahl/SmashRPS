@@ -17,6 +17,10 @@ class Socket:
             self.sock = sock
             self.start_listening()
 
+    def restart(self):
+        self.sock = socket.socket()
+        self.isconnected = False
+
     def connect(self, host="localhost", port=54545):
         try:
             self.sock.connect((host, port))

@@ -77,14 +77,16 @@ class Display:
         elif data['title'] == 'home':
             self.current_page = self.pages[0] # home
             self.current_page.restart()
+            self.socket.restart()
         elif data['title'] == 'update name':
             self.socket.send_data(data)
-        elif data['title'] == 'jump':
+        else:
             self.socket.send_data(data)
 
     def disconnected(self):
         self.current_page = self.pages[0] # home
         self.current_page.restart()
+        self.socket.restart()
     
     def got_data(self, data):
         if data['title'] == 'update state':
