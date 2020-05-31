@@ -30,7 +30,7 @@ maps = [
         ]
     }
 ]
-death = 1.1
+death = 2
 player_acc = 100
 player_max_speed = 300
 friction = 100

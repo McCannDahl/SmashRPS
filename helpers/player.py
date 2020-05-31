@@ -69,12 +69,24 @@ class Player:
 
     def update(self, t):
         self.fall(t)
+        self.move(t)
         self.update_positions(t)
         self.update_attack(t)
     
     def fall(self, t):
         self.velY += gravity * t
-    
+
+    def move(self, t):
+        if self.left:
+            self.velX -= player_acc * t
+        if self.right:
+            self.velX += player_acc * t
+        if self.velX > player_max_speed * -1 and self.velX < 0:
+            self.velX = player_max_speed * -1
+        if self.velX < player_max_speed and self.velX > 0:
+            self.velX = player_max_speed
+        # add friction
+
     def update_positions(self, t):
         self.x += self.velX * t
         self.y += self.velY * t
