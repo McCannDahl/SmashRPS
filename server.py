@@ -13,6 +13,7 @@ players = []  # array of player colors, postions, attacks, health
 walls = [
     Rec(0, 0, 100, 100)
 ]
+playing = False
 
 serversocket.bind((host, port))
 print('listening ("conrol + c" to stop)')
@@ -23,7 +24,34 @@ def listen_for_connections():
         clientsocket, addr = serversocket.accept()
         print("got a connection from %s" % str(addr))
         player_id = len(players)+1
-        players.append(Player(clientsocket, player_id, disconnected))
+        players.append(Player(clientsocket, player_id, action))
+
+def action(data):
+    if data['title'] == 'disconnected':
+        disconnected(data['data'])
+    if data['title'] == 'check if everyone is ready':
+        everyone_is_ready = True
+        for p in players:
+            if not p.ready:
+                everyone_is_ready = False
+        if everyone_is_ready:
+            start_game()
+
+def start_game():
+    setup_game()
+    send_message({
+        'title': 'start game'
+    })
+
+def setup_game():
+    setup_map()
+    setup_players_positions()
+
+def setup_map():
+    pass
+
+def setup_players_positions():
+    pass
 
 def disconnected(player):
     if player in players:
@@ -44,51 +72,94 @@ def update_state(t):
     for p in players:
         p.update(t)
     # handle player collisions
-    for p in players:
-        for q in players:
-            if p != q:
-                handle_player_collision(p, q)
+    if playing:
+        for p in players:
+            for q in players:
+                if p != q:
+                    handle_player_collision(p, q)
     # handle wall collisions
     for wall in walls:
         for p in players:
             handle_wall_collision(wall, p)
 
-def handle_player_collision(p, q): # only account for p. Move 1/2 the amount.
-    if p.velY < 0:
-        pass
-    elif p.velY > 0:
-        pass
-    if p.velX < 0:
-        pass
-    elif p.velX > 0:
+def handle_player_collision(p, q):
+    if (
+        (p.velY >= 0 and q.velY >= 0) or 
+        (p.velY <= 0 and q.velY <= 0)
+    ): # going opposite direcitons. vq = -vp, vp = -vq
+        if p.velY < 0:
+            if (
+                (p.y < q.y + q.h and p.y > q.y) and
+                (p.x + p.w > q.x and p.x < q.x + q.w)
+            ):
+                p.y = q.y + q.h
+                p.velY = -q.velY
+                q.velY = -p.velY
+        elif p.velY > 0:
+            if (
+                (p.y + p.h < q.y + q.h and p.y + p.h > q.y) and
+                (p.x + p.w > q.x and p.x < q.x + q.w)
+            ):
+                p.y = q.y - p.h
+                p.velY = -q.velY
+                q.velY = -p.velY
+        if p.velX < 0:
+            if (
+                (p.x < q.x + q.w and p.x > q.x) and
+                (p.y + p.h > q.y and p.y < q.y + q.h)
+            ):
+                p.x = q.x + q.w
+                p.velX = -q.velX
+                q.velX = -p.velX
+        elif p.velX > 0:
+            if (
+                (p.x + p.w < q.x + q.w and p.x + p.w > q.x) and
+                (p.y + p.h > q.y and p.y < q.y + q.h)
+            ):
+                p.x = q.x - p.w
+                p.velX = -q.velX
+                q.velX = -p.velX
+    else: # they are going the same direction. vq = vp, vp = vq
         pass
 
 def handle_wall_collision(wall, p):
     if p.velY < 0: # going up
         if (
-            (p.y <= wall.y + wall.h and p.y >= wall.y) or # assumming wall is taller than person
-            (wall.y + wall.h <= p.y + p.h and wall.y + wall.h >= p.y)
+            (
+                (p.y < wall.y + wall.h and p.y > wall.y) or # assumming wall is taller than person
+                (wall.y + wall.h < p.y + p.h and wall.y + wall.h > p.y)
+            ) and
+            (p.x + p.w > wall.x and p.x < wall.x + wall.w)
         ): # assuming person is taller than wall
             p.y = wall.y + wall.h
             p.velY = 0
     elif p.velY > 0: # going down
         if (
-            (p.y + p.h <= wall.y + wall.h and p.y + p.h >= wall.y) or # assumming wall is taller than person
-            (wall.y <= p.y + p.h and wall.y >= p.y)
+            (
+                (p.y + p.h < wall.y + wall.h and p.y + p.h > wall.y) or # assumming wall is taller than person
+                (wall.y < p.y + p.h and wall.y > p.y)
+            ) and
+            (p.x + p.w > wall.x and p.x < wall.x + wall.w)
         ): # assuming person is taller than wall
             p.y = wall.y - p.h
             p.velY = 0
     if p.velX < 0: # going left
         if (
-            (p.x <= wall.x + wall.w and p.x >= wall.x) or # assumming wall is taller than person
-            (wall.x + wall.w <= p.x + p.w and wall.x + wall.w >= p.x)
+            (
+                (p.x < wall.x + wall.w and p.x > wall.x) or # assumming wall is taller than person
+                (wall.x + wall.w < p.x + p.w and wall.x + wall.w > p.x)
+            ) and
+            (p.y + p.h > wall.y and p.y < wall.y + wall.h)
         ): # assuming person is taller than wall
             p.x = wall.x + wall.w
             p.velX = 0
     elif p.velX > 0: # going right
         if (
-            (p.x + p.w <= wall.x + wall.w and p.x + p.w >= wall.x) or # assumming wall is taller than person
-            (wall.x <= p.x + p.w and wall.x >= p.x)
+            (
+                (p.x + p.w < wall.x + wall.w and p.x + p.w > wall.x) or # assumming wall is taller than person
+                (wall.x < p.x + p.w and wall.x > p.x)
+            ) and
+            (p.y + p.h > wall.y and p.y < wall.y + wall.h)
         ): # assuming person is taller than wall
             p.x = wall.x - p.w
             p.velX = 0
@@ -99,15 +170,18 @@ def get_data_to_send_to_client(p):
 def send_state():
     while True:
         simple_players = list(map(get_data_to_send_to_client, players))
-        for p in players:
-            try:
-                message = {'title':'update state', 'data':simple_players} # for now lets just send the players instead of state
-                p.sock.send(message)
-            except Exception as err:
-                print(err)
-                print('removing client')
-                disconnected(p)
+        message = {'title':'update state', 'data':simple_players} # for now lets just send the players instead of state
+        send_message(message)
         time.sleep(0.01)
+
+def send_message(message):
+    for p in players:
+        try:
+            p.sock.send(message)
+        except Exception as err:
+            print(err)
+            print('removing client')
+            disconnected(p)
 
 if __name__ == '__main__':
     Thread(target=listen_for_connections, args=[], kwargs=None, daemon=True).start()

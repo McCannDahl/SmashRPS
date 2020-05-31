@@ -5,14 +5,11 @@ from pages.page import Page
 from pages.connect import Connect
 from pages.lobby import Lobby
 from pages.error import Error
+from pages.game import Game
+from pages.game_over import GameOver
 from helpers.socket import Socket
 import json
 
-
-class Game:
-    def __init__(self):
-        self.display = Display()
-        self.display.start()
 
 class Display:
     pages = []
@@ -27,6 +24,8 @@ class Display:
         self.pages.append(Connect(self.screen, self.action))
         self.pages.append(Lobby(self.screen, self.action))
         self.pages.append(Error(self.screen, self.action))
+        self.pages.append(Game(self.screen, self.action))
+        self.pages.append(GameOver(self.screen, self.action))
         self.current_page: Page = self.pages[0]
         self.screen_size = pygame.display.get_surface().get_size()
         self.set_all_pages_screen_sizes()
@@ -78,8 +77,6 @@ class Display:
             self.current_page = self.pages[0] # home
             self.current_page.restart()
             self.socket.restart()
-        elif data['title'] == 'update name':
-            self.socket.send_data(data)
         else:
             self.socket.send_data(data)
 
@@ -91,6 +88,9 @@ class Display:
     def got_data(self, data):
         if data['title'] == 'update state':
             self.current_page.update_state(data['data'])
+        elif data['title'] == 'start game':
+            self.current_page = self.pages[3] # game
+
     
     def join(self, ip):
         self.socket.connect(ip)
@@ -101,4 +101,5 @@ class Display:
             self.current_page = self.pages[2] # error
 
 if __name__ == '__main__':
-    g = Game()
+    display = Display()
+    display.start()

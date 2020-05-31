@@ -16,17 +16,21 @@ class Player:
     w = 20
     h = 20
     health = 100
+    ready = False
 
-    def __init__(self, sock, player_num, server_disconnected):
+    def __init__(self, sock, player_num, action):
         self.sock = Socket(self.got_data, self.disconnected, sock)
         self.id = player_num
         self.name = 'Player '+str(self.id)
         if self.id < 8:
             self.color = colors[self.id]
-        self.server_disconnected = server_disconnected
+        self.action = action
 
     def disconnected(self):
-        self.server_disconnected(self)
+        self.action({
+            'title': 'disconnected',
+            'data': self
+        })
 
     def got_data(self, data):
         if data['title'] == 'update name':
@@ -39,6 +43,11 @@ class Player:
             if color_index >= len(colors):
                 color_index = 0
             self.color = colors[color_index]
+        elif data['title'] == 'ready to start':
+            self.ready = True
+            self.action({
+                'title': 'check if everyone is ready'
+            })
 
     def jump(self):
         self.velY = jump_speed * -1
@@ -69,5 +78,6 @@ class Player:
             'x': self.x,
             'y': self.y,
             'width': self.w,
-            'height': self.h
+            'height': self.h,
+            'ready': self.ready
         }
