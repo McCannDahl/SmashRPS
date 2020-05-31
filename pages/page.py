@@ -12,6 +12,8 @@ class Page:
     #overridden methods
     def handle_keydown(self, key):
         pass
+    def handle_keyup(self, key):
+        pass
     def handle_mouse_event(self, position):
         pass
     def render(self):

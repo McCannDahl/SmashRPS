@@ -1,4 +1,6 @@
 
+from helpers.rec import Rec
+
 colors = [
     [0,0,0],
     [255,0,0],
@@ -11,3 +13,24 @@ colors = [
 ]
 gravity = 1600
 jump_speed = 500
+
+maps = [
+    {
+        'w': 400,
+        'h': 300,
+        'walls': [
+            Rec(0, 0, 400, 40)
+        ]
+    },
+    {
+        'w': 400,
+        'h': 300,
+        'walls': [
+            Rec(0, 300, 400, 40)
+        ]
+    }
+]
+death = 1.1
+player_acc = 100
+player_max_speed = 300
+friction = 100

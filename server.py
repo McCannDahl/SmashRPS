@@ -5,15 +5,14 @@ import socket
 from helpers.player import Player
 from helpers.socket import Socket
 from helpers.rec import Rec
+from helpers.constants import *
 
 serversocket = socket.socket()
 host = ''
 port = 54545
 players = []  # array of player colors, postions, attacks, health
-walls = [
-    Rec(0, 0, 100, 100)
-]
 playing = False
+map_index = 0 # todo have this be selectable
 
 serversocket.bind((host, port))
 print('listening ("conrol + c" to stop)')
@@ -39,8 +38,12 @@ def action(data):
 
 def start_game():
     setup_game()
+    map_index = 1
     send_message({
-        'title': 'start game'
+        'title': 'start game',
+        'data': {
+            'map index': map_index
+        }
     })
 
 def setup_game():
@@ -78,7 +81,7 @@ def update_state(t):
                 if p != q:
                     handle_player_collision(p, q)
     # handle wall collisions
-    for wall in walls:
+    for wall in maps[map_index]['walls']:
         for p in players:
             handle_wall_collision(wall, p)
 

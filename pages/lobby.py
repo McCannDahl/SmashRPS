@@ -10,13 +10,13 @@ class Lobby(Page):
         self.name = ''
         self.button_x = 0
         self.button_y = 0
-        self.button_width = 170
-        self.button_height = 50
+        self.button_w = 170
+        self.button_h = 50
 
         self.button2_x = 0
         self.button2_y = 0
-        self.button2_width = 200
-        self.button2_height = 60
+        self.button2_w = 200
+        self.button2_h = 60
 
     def handle_keydown(self, key):
         key_string = pygame.key.name(key)
@@ -39,10 +39,10 @@ class Lobby(Page):
 
     def handle_mouse_event(self, position):
         x, y = position
-        if x >= self.button_x and x <= self.button_x + self.button_width and y >= self.button_y and y <= self.button_y + self.button_height:
+        if x >= self.button_x and x <= self.button_x + self.button_w and y >= self.button_y and y <= self.button_y + self.button_h:
             self.action({'title': 'ready to start'})
             
-        if x >= self.button2_x and x <= self.button2_x + self.button2_width and y >= self.button2_y and y <= self.button2_y + self.button2_height:
+        if x >= self.button2_x and x <= self.button2_x + self.button2_w and y >= self.button2_y and y <= self.button2_y + self.button2_h:
             self.action({'title': 'change color'})
 
     def render(self):
@@ -56,7 +56,7 @@ class Lobby(Page):
             pygame.draw.rect(
                 self.screen, 
                 (p['color'][0], p['color'][1], p['color'][2]),
-                (self.screen_w/2 - 60 - p['width'], y + p['y'] + p['height'], p['width'], p['height'])
+                (self.screen_w/2 - 60 - p['w'], y + p['y'] + p['h'], p['w'], p['h'])
             )
             
             textsurface = self.name_font.render(p['name'], False, (0, 0, 0))
@@ -67,7 +67,7 @@ class Lobby(Page):
 
         self.button2_x = self.screen_w/2 - 120
         self.button2_y = y
-        pygame.draw.rect(self.screen, (120, 60, 120), (self.button2_x, self.button2_y, self.button2_width, self.button2_height), 2)
+        pygame.draw.rect(self.screen, (120, 60, 120), (self.button2_x, self.button2_y, self.button2_w, self.button2_h), 2)
         y += 5
 
         textsurface = self.title_font.render('Change Color', False, (180, 60, 180))
@@ -76,7 +76,7 @@ class Lobby(Page):
         
         self.button_x = self.screen_w/2 - 105
         self.button_y = y
-        pygame.draw.rect(self.screen, (60, 120, 120), (self.button_x, self.button_y, self.button_width, self.button_height), 2)
+        pygame.draw.rect(self.screen, (60, 120, 120), (self.button_x, self.button_y, self.button_w, self.button_h), 2)
         y += 5
 
         if not p['ready']:

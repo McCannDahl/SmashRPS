@@ -42,6 +42,7 @@ class Socket:
 
     def get_data(self):
         while self.isconnected:
+            teststr = ''
             try:
                 teststr = self.sock.recv(1024).decode("utf-8")
                 if teststr.endswith('>>>'): # last message is complete
@@ -53,6 +54,7 @@ class Socket:
                 test = json.loads(teststr)
                 self.got_data(test)
             except Exception as err:
+                print(teststr)
                 print('There was a problem getting server data. Closing socket. '+str(err))
                 self.sock.close()
                 self.isconnected = False

@@ -9,6 +9,7 @@ from pages.game import Game
 from pages.game_over import GameOver
 from helpers.socket import Socket
 import json
+from helpers.constants import *
 
 
 class Display:
@@ -57,6 +58,10 @@ class Display:
             if event.type == pygame.KEYDOWN:
                 if self.current_page != None:
                     self.current_page.handle_keydown(event.key)
+
+            if event.type == pygame.KEYUP:
+                if self.current_page != None:
+                    self.current_page.handle_keyup(event.key)
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 position = event.pos
@@ -89,9 +94,11 @@ class Display:
         if data['title'] == 'update state':
             self.current_page.update_state(data['data'])
         elif data['title'] == 'start game':
+            data = data['data']
+            map = maps[data['map index']]
             self.current_page = self.pages[3] # game
+            self.current_page.set_map(map)
 
-    
     def join(self, ip):
         self.socket.connect(ip)
         if self.socket.isconnected:

@@ -11,8 +11,8 @@ class Connect(Page):
         self.ipaddress = '127.0.0.1'
         self.button_x = 50
         self.button_y = 150
-        self.button_width = 80
-        self.button_height = 50
+        self.button_w = 80
+        self.button_h = 50
         self.button_clicked = False
 
     def handle_keydown(self, key):
@@ -25,7 +25,7 @@ class Connect(Page):
 
     def handle_mouse_event(self, position):
         x, y = position
-        if x >= self.button_x and x <= self.button_x + self.button_width and y >= self.button_y and y <= self.button_y + self.button_height:
+        if x >= self.button_x and x <= self.button_x + self.button_w and y >= self.button_y and y <= self.button_y + self.button_h:
             if not self.button_clicked:
                 self.action({'title': 'join', 'data': self.ipaddress})
                 self.button_clicked = True
@@ -38,7 +38,7 @@ class Connect(Page):
         self.screen.blit(textsurface, (self.screen_w/2 - len(self.ipaddress)*5, 100))
 
         self.button_x = self.screen_w/2 - 40
-        pygame.draw.rect(self.screen, (100, 100, 180), (self.button_x, self.button_y, self.button_width, self.button_height), 2)
+        pygame.draw.rect(self.screen, (100, 100, 180), (self.button_x, self.button_y, self.button_w, self.button_h), 2)
         
         textsurface = self.title_font.render('Join', False, (100, 100, 180))
         if self.button_clicked:

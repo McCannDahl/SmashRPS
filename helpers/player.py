@@ -25,6 +25,8 @@ class Player:
         if self.id < 8:
             self.color = colors[self.id]
         self.action = action
+        self.left = False
+        self.right = False
 
     def disconnected(self):
         self.action({
@@ -37,6 +39,16 @@ class Player:
             self.name = data['data']
         elif data['title'] == 'jump':
             self.jump()
+        elif data['title'] == 'attack':
+            self.set_attack(data['data'])
+        elif data['title'] == 'left down':
+            self.left = True
+        elif data['title'] == 'right down':
+            self.right = True
+        elif data['title'] == 'left up':
+            self.left = False
+        elif data['title'] == 'right up':
+            self.right = False
         elif data['title'] == 'change color':
             color_index = colors.index(self.color)
             color_index += 1
@@ -52,8 +64,8 @@ class Player:
     def jump(self):
         self.velY = jump_speed * -1
 
-    def set_attack(self):
-        pass
+    def set_attack(self, attack):
+        self.attack = attack
 
     def update(self, t):
         self.fall(t)
@@ -77,7 +89,7 @@ class Player:
             'attack': self.attack,
             'x': self.x,
             'y': self.y,
-            'width': self.w,
-            'height': self.h,
+            'w': self.w,
+            'h': self.h,
             'ready': self.ready
         }
