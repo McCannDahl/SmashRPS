@@ -79,6 +79,5 @@ class Lobby(Page):
         pygame.draw.rect(self.screen, (60, 120, 120), (self.button_x, self.button_y, self.button_w, self.button_h), 2)
         y += 5
 
-        if not p['ready']:
-            textsurface = self.title_font.render('I\'m Ready', False, (60, 180, 180))
-            self.screen.blit(textsurface, (self.screen_w/2 - 100, y + 5))
+        textsurface = self.title_font.render('I\'m Ready', False, (60, 180, 180))
+        self.screen.blit(textsurface, (self.screen_w/2 - 100, y + 5))

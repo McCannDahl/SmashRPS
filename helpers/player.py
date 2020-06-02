@@ -64,7 +64,8 @@ class Player:
             })
 
     def jump(self):
-        self.velY = jump_speed * -1
+        if self.on_ground:
+            self.velY = jump_speed * -1
 
     def set_attack(self, attack):
         self.attack = attack
@@ -84,19 +85,23 @@ class Player:
         if self.right:
             self.velX += player_acc * t
 
-        print(self.on_ground)
-        print(self.velX)
-        if self.on_ground:
-            self.velX = self.velX * friction
-        print(self.velX)
+        if self.left == False and self.right == False:
+            if self.on_ground:
+                if self.velX > 0:
+                    if self.velX > friction_de_acc * t:
+                        self.velX -= friction_de_acc * t
+                    else:
+                        self.velX = 0
+                elif self.velX < 0:
+                    if self.velX < -1 * (friction_de_acc * t):
+                        self.velX += friction_de_acc * t
+                    else:
+                        self.velX = 0
 
-        if self.velX > player_max_speed * -1 and self.velX < 0:
+        if self.velX < player_max_speed * -1:
             self.velX = player_max_speed * -1
-        if self.velX < player_max_speed and self.velX > 0:
+        if self.velX > player_max_speed:
             self.velX = player_max_speed
-
-        if abs(self.velX) < friction_stop_threshold:
-            self.velX = 0
 
     def update_positions(self, t):
         self.x += self.velX * t

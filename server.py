@@ -12,7 +12,7 @@ host = ''
 port = 54545
 players = []  # array of player colors, postions, attacks, health
 playing = False
-map_index = 0 # todo have this be selectable
+map_index = 0
 
 serversocket.bind((host, port))
 print('listening ("conrol + c" to stop)')
@@ -81,6 +81,8 @@ def update_state(t):
                 if p != q:
                     handle_player_collision(p, q)
     # handle wall collisions
+    for p in players:
+        p.on_ground = False
     for wall in maps[map_index]['walls']:
         for p in players:
             handle_wall_collision(wall, p)
@@ -126,7 +128,6 @@ def handle_player_collision(p, q):
         pass
 
 def handle_wall_collision(wall, p):
-    p.on_ground = False
     if p.velY < 0: # going up
         if (
             (
