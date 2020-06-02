@@ -45,16 +45,19 @@ class Socket:
             teststr = ''
             try:
                 teststr = self.sock.recv(1024).decode("utf-8")
-                if teststr.endswith('>>>'): # last message is complete
-                    teststr = teststr.split("<<<")[-1]
-                else: # last message is incomplete
-                    teststr = teststr.split("<<<")[-2]
-                teststr = teststr.replace('>>>','')
-                # print(teststr)
-                test = json.loads(teststr)
-                self.got_data(test)
+                new = teststr
+                if '<<<' in new and '>>>' in new:
+                    if new.endswith('>>>'): # last message is complete
+                        new = new.split("<<<")[-1]
+                    else: # last message is incomplete
+                        new = new.split("<<<")[-2]
+                    new = new.replace('>>>','')
+                    # print(teststr)
+                    test = json.loads(new)
+                    self.got_data(test)
             except Exception as err:
                 print(teststr)
+                print(new)
                 print('There was a problem getting server data. Closing socket. '+str(err))
                 self.sock.close()
                 self.isconnected = False

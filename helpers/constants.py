@@ -32,5 +32,9 @@ maps = [
 ]
 death = 2
 player_acc = 100
-player_max_speed = 300
-friction = 100
+player_max_speed = 100
+friction = 0.2
+sleep_amount = 0.01
+friction_stop_threshold = 50
+on_ground_threshold = 300
+rebound_amount = 0.6

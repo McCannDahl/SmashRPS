@@ -38,7 +38,6 @@ def action(data):
 
 def start_game():
     setup_game()
-    map_index = 1
     send_message({
         'title': 'start game',
         'data': {
@@ -51,7 +50,8 @@ def setup_game():
     setup_players_positions()
 
 def setup_map():
-    pass
+    global map_index
+    map_index = 1
 
 def setup_players_positions():
     pass
@@ -68,7 +68,7 @@ def update():
         t = old_time - new_time
         new_time = old_time
         update_state(t)
-        time.sleep(0.01)
+        time.sleep(sleep_amount)
 
 def update_state(t):
     # go through players and update all states
@@ -96,36 +96,37 @@ def handle_player_collision(p, q):
                 (p.x + p.w > q.x and p.x < q.x + q.w)
             ):
                 p.y = q.y + q.h
-                p.velY = -q.velY
-                q.velY = -p.velY
+                p.velY = -q.velY*rebound_amount
+                q.velY = -p.velY*rebound_amount
         elif p.velY > 0:
             if (
                 (p.y + p.h < q.y + q.h and p.y + p.h > q.y) and
                 (p.x + p.w > q.x and p.x < q.x + q.w)
             ):
                 p.y = q.y - p.h
-                p.velY = -q.velY
-                q.velY = -p.velY
+                p.velY = -q.velY*rebound_amount
+                q.velY = -p.velY*rebound_amount
         if p.velX < 0:
             if (
                 (p.x < q.x + q.w and p.x > q.x) and
                 (p.y + p.h > q.y and p.y < q.y + q.h)
             ):
                 p.x = q.x + q.w
-                p.velX = -q.velX
-                q.velX = -p.velX
+                p.velX = -q.velX*rebound_amount
+                q.velX = -p.velX*rebound_amount
         elif p.velX > 0:
             if (
                 (p.x + p.w < q.x + q.w and p.x + p.w > q.x) and
                 (p.y + p.h > q.y and p.y < q.y + q.h)
             ):
                 p.x = q.x - p.w
-                p.velX = -q.velX
-                q.velX = -p.velX
+                p.velX = -q.velX*rebound_amount
+                q.velX = -p.velX*rebound_amount
     else: # they are going the same direction. vq = vp, vp = vq
         pass
 
 def handle_wall_collision(wall, p):
+    p.on_ground = False
     if p.velY < 0: # going up
         if (
             (
@@ -135,7 +136,7 @@ def handle_wall_collision(wall, p):
             (p.x + p.w > wall.x and p.x < wall.x + wall.w)
         ): # assuming person is taller than wall
             p.y = wall.y + wall.h
-            p.velY = 0
+            p.velY = -p.velY * rebound_amount
     elif p.velY > 0: # going down
         if (
             (
@@ -145,7 +146,11 @@ def handle_wall_collision(wall, p):
             (p.x + p.w > wall.x and p.x < wall.x + wall.w)
         ): # assuming person is taller than wall
             p.y = wall.y - p.h
-            p.velY = 0
+            if p.velY < on_ground_threshold:
+                p.velY = 0
+                p.on_ground = True
+            else:
+                p.velY = -p.velY * rebound_amount
     if p.velX < 0: # going left
         if (
             (
@@ -155,7 +160,7 @@ def handle_wall_collision(wall, p):
             (p.y + p.h > wall.y and p.y < wall.y + wall.h)
         ): # assuming person is taller than wall
             p.x = wall.x + wall.w
-            p.velX = 0
+            p.velX = -p.velX * rebound_amount
     elif p.velX > 0: # going right
         if (
             (
@@ -165,7 +170,7 @@ def handle_wall_collision(wall, p):
             (p.y + p.h > wall.y and p.y < wall.y + wall.h)
         ): # assuming person is taller than wall
             p.x = wall.x - p.w
-            p.velX = 0
+            p.velX = -p.velX * rebound_amount
 
 def get_data_to_send_to_client(p):
     return p.get_data_to_send_to_client()
@@ -175,7 +180,7 @@ def send_state():
         simple_players = list(map(get_data_to_send_to_client, players))
         message = {'title':'update state', 'data':simple_players} # for now lets just send the players instead of state
         send_message(message)
-        time.sleep(0.01)
+        time.sleep(sleep_amount)
 
 def send_message(message):
     for p in players:

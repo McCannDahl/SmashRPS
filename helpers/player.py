@@ -17,6 +17,7 @@ class Player:
     h = 20
     health = 100
     ready = False
+    on_ground = False
 
     def __init__(self, sock, player_num, action):
         self.sock = Socket(self.got_data, self.disconnected, sock)
@@ -27,6 +28,7 @@ class Player:
         self.action = action
         self.left = False
         self.right = False
+        self.on_ground = False
 
     def disconnected(self):
         self.action({
@@ -81,11 +83,20 @@ class Player:
             self.velX -= player_acc * t
         if self.right:
             self.velX += player_acc * t
+
+        print(self.on_ground)
+        print(self.velX)
+        if self.on_ground:
+            self.velX = self.velX * friction
+        print(self.velX)
+
         if self.velX > player_max_speed * -1 and self.velX < 0:
             self.velX = player_max_speed * -1
         if self.velX < player_max_speed and self.velX > 0:
             self.velX = player_max_speed
-        # add friction
+
+        if abs(self.velX) < friction_stop_threshold:
+            self.velX = 0
 
     def update_positions(self, t):
         self.x += self.velX * t
