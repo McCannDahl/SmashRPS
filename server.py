@@ -99,6 +99,8 @@ def handle_player_collision(p, q):
             temp = p.velY
             p.velY = q.velY*rebound_amount
             q.velY = temp*rebound_amount
+            attack(p, q, 'up')
+
     elif p.velY > 0:
         if (
                 (p.y + p.h < q.y + q.h and p.y + p.h > q.y) and
@@ -108,6 +110,7 @@ def handle_player_collision(p, q):
             temp = p.velY
             p.velY = q.velY*rebound_amount
             q.velY = temp*rebound_amount
+            attack(p, q, 'down')
             
     if p.velX < 0:
         if (
@@ -118,6 +121,8 @@ def handle_player_collision(p, q):
             temp = p.velX
             p.velX = q.velX*rebound_amount
             q.velX = temp*rebound_amount
+            attack(p, q, 'left')
+
     elif p.velX > 0:
         if (
                 (p.x + p.w < q.x + q.w and p.x + p.w > q.x) and
@@ -127,7 +132,57 @@ def handle_player_collision(p, q):
             temp = p.velX
             p.velX = q.velX*rebound_amount
             q.velX = temp*rebound_amount
+            attack(p, q, 'right')
 
+def attack(p: Player, q: Player, p_direction):
+    if p.attack and q.attack:
+        if p.attack != q.attack:
+            if p.attack == 'r' and q.attack == 'p': # q wins
+                hit(p, opposite(p_direction), True)
+            elif p.attack == 'p' and q.attack == 's': # q wins
+                hit(p, opposite(p_direction), True)
+            elif p.attack == 's' and q.attack == 'r': # q wins
+                hit(p, opposite(p_direction), True)
+            elif p.attack == 's' and q.attack == 'p': # p wins
+                hit(q, p_direction, True)
+            elif p.attack == 'r' and q.attack == 's': # p wins
+                hit(q, p_direction, True)
+            elif p.attack == 'p' and q.attack == 'r': # p wins
+                hit(q, p_direction, True)
+
+    elif not p.attack and q.attack:
+        hit(p, opposite(p_direction))
+    elif p.attack and not q.attack:
+        hit(q, p_direction)
+
+def opposite(direction):
+    if direction == 'down':
+        return 'up'
+    elif direction == 'up':
+        return 'down'
+    elif direction == 'left':
+        return 'right'
+    elif direction == 'right':
+        return 'left'
+    else:
+        return None
+
+def hit(p, direction, mega=False):
+    if p.health > health_reduction:
+        p.health -= health_reduction
+    else:
+        p.health = 0.01
+    amount = hit_amount / p.health
+    if mega:
+        amount = amount * hit_multiplyer
+    if direction == 'up':
+        p.velY -= amount
+    if direction == 'down':
+        p.velY += amount
+    if direction == 'left':
+        p.velX -= amount
+    if direction == 'right':
+        p.velX += amount
 
 def handle_wall_collision(wall, p):
     if p.velY < 0: # going up

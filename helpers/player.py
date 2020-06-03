@@ -15,9 +15,10 @@ class Player:
     y = 0
     w = 20
     h = 20
-    health = 100
+    health = 1
     ready = False
     on_ground = False
+    attack_time = 0
 
     def __init__(self, sock, player_num, action):
         self.sock = Socket(self.got_data, self.disconnected, sock)
@@ -64,11 +65,14 @@ class Player:
             })
 
     def jump(self):
-        if self.on_ground:
-            self.velY = jump_speed * -1
+        if not self.attack:
+            if self.on_ground:
+                self.velY = jump_speed * -1
 
     def set_attack(self, attack):
-        self.attack = attack
+        if not self.attack:
+            self.attack = attack
+            self.attack_time = 0
 
     def update(self, t):
         self.fall(t)
@@ -80,10 +84,12 @@ class Player:
         self.velY += gravity * t
 
     def move(self, t):
-        if self.left:
-            self.velX -= player_acc * t
-        if self.right:
-            self.velX += player_acc * t
+        if not self.attack:
+            if abs(self.velX) < player_max_speed:
+                if self.left:
+                    self.velX -= player_acc * t
+                if self.right:
+                    self.velX += player_acc * t
 
         if self.left == False and self.right == False:
             # if self.on_ground:
@@ -98,17 +104,20 @@ class Player:
                 else:
                     self.velX = 0
 
-        if self.velX < player_max_speed * -1:
-            self.velX = player_max_speed * -1
-        if self.velX > player_max_speed:
-            self.velX = player_max_speed
+        # if self.velX < player_max_speed * -1:
+        #    self.velX = player_max_speed * -1
+        # if self.velX > player_max_speed:
+        #    self.velX = player_max_speed
 
     def update_positions(self, t):
         self.x += self.velX * t
         self.y += self.velY * t
 
     def update_attack(self,t):
-        pass
+        if self.attack:
+            self.attack_time += t
+            if self.attack_time >= attack_total_time:
+                self.attack = None
 
     def get_data_to_send_to_client(self):
         return {
@@ -119,5 +128,6 @@ class Player:
             'y': self.y,
             'w': self.w,
             'h': self.h,
-            'ready': self.ready
+            'ready': self.ready,
+            'health': self.health
         }

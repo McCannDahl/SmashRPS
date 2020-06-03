@@ -41,3 +41,8 @@ sleep_amount = 0.01
 friction_stop_threshold = 5
 on_ground_threshold = 400
 rebound_amount = 0.5
+attack_total_time = 0.5
+
+hit_amount = 200
+hit_multiplyer = 2
+health_reduction = 0.1
