@@ -43,7 +43,6 @@ class Game(Page):
 
     def handle_keyup(self, key):
         key_string = pygame.key.name(key)
-        print('key up '+key_string)
         if key_string == 'left':
             self.action({
                 'title': 'left up'

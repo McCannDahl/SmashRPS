@@ -37,6 +37,7 @@ def action(data):
             start_game()
 
 def start_game():
+    global playing
     setup_game()
     send_message({
         'title': 'start game',
@@ -44,6 +45,7 @@ def start_game():
             'map index': map_index
         }
     })
+    playing = True
 
 def setup_game():
     setup_map()
@@ -88,44 +90,44 @@ def update_state(t):
             handle_wall_collision(wall, p)
 
 def handle_player_collision(p, q):
-    if (
-        (p.velY >= 0 and q.velY >= 0) or 
-        (p.velY <= 0 and q.velY <= 0)
-    ): # going opposite direcitons. vq = -vp, vp = -vq
-        if p.velY < 0:
-            if (
+    if p.velY < 0:
+        if (
                 (p.y < q.y + q.h and p.y > q.y) and
                 (p.x + p.w > q.x and p.x < q.x + q.w)
-            ):
-                p.y = q.y + q.h
-                p.velY = -q.velY*rebound_amount
-                q.velY = -p.velY*rebound_amount
-        elif p.velY > 0:
-            if (
+        ):
+            p.y = q.y + q.h
+            temp = p.velY
+            p.velY = q.velY*rebound_amount
+            q.velY = temp*rebound_amount
+    elif p.velY > 0:
+        if (
                 (p.y + p.h < q.y + q.h and p.y + p.h > q.y) and
                 (p.x + p.w > q.x and p.x < q.x + q.w)
-            ):
-                p.y = q.y - p.h
-                p.velY = -q.velY*rebound_amount
-                q.velY = -p.velY*rebound_amount
-        if p.velX < 0:
-            if (
+        ):
+            p.y = q.y - p.h
+            temp = p.velY
+            p.velY = q.velY*rebound_amount
+            q.velY = temp*rebound_amount
+            
+    if p.velX < 0:
+        if (
                 (p.x < q.x + q.w and p.x > q.x) and
                 (p.y + p.h > q.y and p.y < q.y + q.h)
-            ):
-                p.x = q.x + q.w
-                p.velX = -q.velX*rebound_amount
-                q.velX = -p.velX*rebound_amount
-        elif p.velX > 0:
-            if (
+        ):
+            p.x = q.x + q.w
+            temp = p.velX
+            p.velX = q.velX*rebound_amount
+            q.velX = temp*rebound_amount
+    elif p.velX > 0:
+        if (
                 (p.x + p.w < q.x + q.w and p.x + p.w > q.x) and
                 (p.y + p.h > q.y and p.y < q.y + q.h)
-            ):
-                p.x = q.x - p.w
-                p.velX = -q.velX*rebound_amount
-                q.velX = -p.velX*rebound_amount
-    else: # they are going the same direction. vq = vp, vp = vq
-        pass
+        ):
+            p.x = q.x - p.w
+            temp = p.velX
+            p.velX = q.velX*rebound_amount
+            q.velX = temp*rebound_amount
+
 
 def handle_wall_collision(wall, p):
     if p.velY < 0: # going up

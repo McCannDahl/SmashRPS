@@ -12,7 +12,7 @@ colors = [
     [148,0,211]
 ]
 gravity = 1500
-jump_speed = 700
+jump_speed = 600
 
 maps = [
     {
@@ -36,8 +36,8 @@ maps = [
 death = 2
 player_acc = 1800
 player_max_speed = 300
-friction_de_acc = player_acc * 1.1
+friction_de_acc = player_acc * 1.4
 sleep_amount = 0.01
 friction_stop_threshold = 5
-on_ground_threshold = 300
-rebound_amount = 0.6
+on_ground_threshold = 400
+rebound_amount = 0.5

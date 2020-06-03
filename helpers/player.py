@@ -86,17 +86,17 @@ class Player:
             self.velX += player_acc * t
 
         if self.left == False and self.right == False:
-            if self.on_ground:
-                if self.velX > 0:
-                    if self.velX > friction_de_acc * t:
-                        self.velX -= friction_de_acc * t
-                    else:
-                        self.velX = 0
-                elif self.velX < 0:
-                    if self.velX < -1 * (friction_de_acc * t):
-                        self.velX += friction_de_acc * t
-                    else:
-                        self.velX = 0
+            # if self.on_ground:
+            if self.velX > 0:
+                if self.velX > friction_de_acc * t:
+                    self.velX -= friction_de_acc * t
+                else:
+                    self.velX = 0
+            elif self.velX < 0:
+                if self.velX < -1 * (friction_de_acc * t):
+                    self.velX += friction_de_acc * t
+                else:
+                    self.velX = 0
 
         if self.velX < player_max_speed * -1:
             self.velX = player_max_speed * -1
