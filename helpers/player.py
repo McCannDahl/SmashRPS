@@ -19,6 +19,7 @@ class Player:
     ready = False
     on_ground = False
     attack_time = 0
+    attack_is_active = False
 
     def __init__(self, sock, player_num, action):
         self.sock = Socket(self.got_data, self.disconnected, sock)
@@ -33,6 +34,7 @@ class Player:
         self.last_hit_by = None
         self.kills = 0
         self.deaths = 0
+        self.winning = False
 
     def disconnected(self):
         self.action({
@@ -68,14 +70,16 @@ class Player:
             })
 
     def jump(self):
-        if not self.attack:
-            if self.on_ground:
-                self.velY = jump_speed * -1
+        # print('on ground = '+str(self.on_ground))
+        # if not self.attack:
+            # if self.on_ground:
+        self.velY = jump_speed * -1
 
     def set_attack(self, attack):
         if not self.attack:
             self.attack = attack
             self.attack_time = 0
+            self.attack_is_active = True
 
     def update(self, t):
         self.fall(t)
@@ -87,12 +91,12 @@ class Player:
         self.velY += gravity * t
 
     def move(self, t):
-        if not self.attack:
-            if abs(self.velX) < player_max_speed:
-                if self.left:
-                    self.velX -= player_acc * t
-                if self.right:
-                    self.velX += player_acc * t
+        if self.velX > -1 * player_max_speed:
+            if self.left:
+                self.velX -= player_acc * t
+        if self.velX < player_max_speed:
+            if self.right:
+                self.velX += player_acc * t
 
         if self.left == False and self.right == False:
             # if self.on_ground:
@@ -121,6 +125,7 @@ class Player:
             self.attack_time += t
             if self.attack_time >= attack_total_time:
                 self.attack = None
+                self.attack_is_active = None
 
     def get_data_to_send_to_client(self):
         return {
@@ -134,7 +139,8 @@ class Player:
             'ready': self.ready,
             'health': self.health,
             'deaths': self.deaths,
-            'kills': self.kills
+            'kills': self.kills,
+            'winning': self.winning
         }
     
     def die(self):

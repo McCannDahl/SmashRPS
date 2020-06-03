@@ -6,8 +6,7 @@ class Game(Page):
     def __init__(self, s, a):
         super().__init__(s)
         self.action = a
-        self.name_font = pygame.font.SysFont('arial', 10)
-        self.map = None
+        self.name_font = pygame.font.SysFont('arial', 20)
         self.ax = 0
         self.ay = 0
     
@@ -17,6 +16,8 @@ class Game(Page):
         self.img_r = pygame.transform.scale(self.img_r, (20, 20))
         self.img_p = pygame.image.load('images/p.png')
         self.img_p = pygame.transform.scale(self.img_p, (20, 20))
+        self.img_crown = pygame.image.load('images/crown.png')
+        self.img_crown = pygame.transform.scale(self.img_crown, (30, 24))
 
     def handle_keydown(self, key):
         key_string = pygame.key.name(key)
@@ -63,6 +64,7 @@ class Game(Page):
         self.render_map()
         for p in self.players:
             self.render_person(p)
+        self.render_time()
         
     def render_map(self):
         if self.map:
@@ -95,9 +97,14 @@ class Game(Page):
             self.screen.blit(self.img_p, (x, y))
         if p['attack'] == 'r':
             self.screen.blit(self.img_r, (x, y))
+        if 'winning' in p:
+            if p['winning']:
+                self.screen.blit(self.img_crown, (x-5, y - 6 - 24))
+                
 
         #textsurface = self.name_font.render(p['name'], False, (0, 0, 0))
         #self.screen.blit(textsurface, (x, y - 10))
 
-    def set_map(self, map):
-        self.map = map
+    def render_time(self):
+        textsurface = self.name_font.render(str(self.time) + ' seconds', False, (0, 0, 0))
+        self.screen.blit(textsurface, (self.ax, self.ay))

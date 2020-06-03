@@ -82,6 +82,9 @@ class Display:
             self.current_page = self.pages[0] # home
             self.current_page.restart()
             self.socket.restart()
+        elif data['title'] == 'lobby':
+            self.current_page = self.pages[1] # lobby
+            self.current_page.im_ready = False
         else:
             self.socket.send_data(data)
 
@@ -93,8 +96,12 @@ class Display:
     def got_data(self, data):
         if data['title'] == 'update state':
             data = data['data']
-            if data['state'] == 1 and self.current_page != self.pages[3]:
+            if data['state'] == 1 and self.current_page == self.pages[1]:
                 self.current_page = self.pages[3]
+                map = maps[data['map index']]
+                self.current_page.set_map(map)
+            if data['state'] == 2 and self.current_page == self.pages[3]:
+                self.current_page = self.pages[4]
                 map = maps[data['map index']]
                 self.current_page.set_map(map)
             self.current_page.update_state(data)
@@ -103,6 +110,7 @@ class Display:
         self.socket.connect(ip)
         if self.socket.isconnected:
             self.current_page = self.pages[1] # lobby
+            self.current_page.im_ready = False
             self.socket.start_listening()
         else:
             self.current_page = self.pages[2] # error

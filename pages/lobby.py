@@ -18,6 +18,8 @@ class Lobby(Page):
         self.button2_w = 200
         self.button2_h = 60
 
+        self.im_ready = False
+
     def handle_keydown(self, key):
         key_string = pygame.key.name(key)
         if key_string == 'up':
@@ -40,7 +42,9 @@ class Lobby(Page):
     def handle_mouse_event(self, position):
         x, y = position
         if x >= self.button_x and x <= self.button_x + self.button_w and y >= self.button_y and y <= self.button_y + self.button_h:
-            self.action({'title': 'ready to start'})
+            if not self.im_ready:
+                self.action({'title': 'ready to start'})
+                self.im_ready = True
             
         if x >= self.button2_x and x <= self.button2_x + self.button2_w and y >= self.button2_y and y <= self.button2_y + self.button2_h:
             self.action({'title': 'change color'})
@@ -74,10 +78,11 @@ class Lobby(Page):
         self.screen.blit(textsurface, (self.screen_w/2 - 115, y + 5))
         y += 60
         
-        self.button_x = self.screen_w/2 - 105
-        self.button_y = y
-        pygame.draw.rect(self.screen, (60, 120, 120), (self.button_x, self.button_y, self.button_w, self.button_h), 2)
-        y += 5
+        if not self.im_ready:
+            self.button_x = self.screen_w/2 - 105
+            self.button_y = y
+            pygame.draw.rect(self.screen, (60, 120, 120), (self.button_x, self.button_y, self.button_w, self.button_h), 2)
+            y += 5
 
-        textsurface = self.title_font.render('I\'m Ready', False, (60, 180, 180))
-        self.screen.blit(textsurface, (self.screen_w/2 - 100, y + 5))
+            textsurface = self.title_font.render('I\'m Ready', False, (60, 180, 180))
+            self.screen.blit(textsurface, (self.screen_w/2 - 100, y + 5))
