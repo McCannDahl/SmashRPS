@@ -52,7 +52,7 @@ class Lobby(Page):
         self.screen.blit(textsurface, (self.screen_w/2 - 150, y))
         y += 50
         
-        for p in self.state:
+        for p in self.players:
             pygame.draw.rect(
                 self.screen, 
                 (p['color'][0], p['color'][1], p['color'][2]),

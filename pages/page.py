@@ -3,11 +3,11 @@ class Page:
         self.screen = s
         self.screen_w = 0
         self.screen_h = 0
-        self.state = []
+        self.players = []
     def set_screen_size(self, size):
         self.screen_w, self.screen_h = size
     def update_state(self, state):
-        self.state = state
+        self.players = state['players']
 
     #overridden methods
     def handle_keydown(self, key):

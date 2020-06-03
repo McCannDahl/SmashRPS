@@ -6,6 +6,7 @@ from helpers.player import Player
 from helpers.socket import Socket
 from helpers.rec import Rec
 from helpers.constants import *
+import random
 
 serversocket = socket.socket()
 host = ''
@@ -13,6 +14,8 @@ port = 54545
 players = []  # array of player colors, postions, attacks, health
 playing = False
 map_index = 0
+game_time = 0
+state = 0 # 0 = lobby, 1 = game, 2 = game over
 
 serversocket.bind((host, port))
 print('listening ("conrol + c" to stop)')
@@ -37,14 +40,11 @@ def action(data):
             start_game()
 
 def start_game():
-    global playing
+    global playing, state
     setup_game()
-    send_message({
-        'title': 'start game',
-        'data': {
-            'map index': map_index
-        }
-    })
+    state = 1
+    for p in players:
+        respawn(p)
     playing = True
 
 def setup_game():
@@ -64,6 +64,7 @@ def disconnected(player):
         players.remove(player)
 
 def update():
+    global game_time
     new_time = time.time()
     while True:
         old_time = time.time()
@@ -71,6 +72,13 @@ def update():
         new_time = old_time
         update_state(t)
         time.sleep(sleep_amount)
+        if playing:
+            game_time += t
+            if game_time > final_game_time:
+                end_game()
+
+def end_game():
+    state = 2
 
 def update_state(t):
     # go through players and update all states
@@ -88,6 +96,32 @@ def update_state(t):
     for wall in maps[map_index]['walls']:
         for p in players:
             handle_wall_collision(wall, p)
+    # go through players and update all states
+    for p in players:
+        check_for_dealths(p)
+
+def check_for_dealths(p):
+    map = maps[map_index]
+    death_left = map['w']/2 - map['w']*death/2
+    death_right = map['w']/2 + map['w']*death/2
+    death_up = map['h']/2 - map['h']*death/2
+    death_down = map['h']/2 + map['h']*death/2
+    if (
+        p.x < death_left or
+        p.y < death_up or
+        p.x + p.w > death_right or
+        p.y + p.h > death_down
+    ):
+        p.die()
+        respawn(p)
+
+def respawn(p):
+    p.y = 0
+    p.x = random.randint(0, maps[map_index]['w'])
+    p.health = 1
+    p.last_hit_by = None
+    p.velX = 0
+    p.velY = 0
 
 def handle_player_collision(p, q):
     if p.velY < 0:
@@ -138,22 +172,22 @@ def attack(p: Player, q: Player, p_direction):
     if p.attack and q.attack:
         if p.attack != q.attack:
             if p.attack == 'r' and q.attack == 'p': # q wins
-                hit(p, opposite(p_direction), True)
+                hit(p, q, opposite(p_direction), True)
             elif p.attack == 'p' and q.attack == 's': # q wins
-                hit(p, opposite(p_direction), True)
+                hit(p, q, opposite(p_direction), True)
             elif p.attack == 's' and q.attack == 'r': # q wins
-                hit(p, opposite(p_direction), True)
+                hit(p, q, opposite(p_direction), True)
             elif p.attack == 's' and q.attack == 'p': # p wins
-                hit(q, p_direction, True)
+                hit(q, q, p_direction, True)
             elif p.attack == 'r' and q.attack == 's': # p wins
-                hit(q, p_direction, True)
+                hit(q, q, p_direction, True)
             elif p.attack == 'p' and q.attack == 'r': # p wins
-                hit(q, p_direction, True)
+                hit(q, q, p_direction, True)
 
     elif not p.attack and q.attack:
-        hit(p, opposite(p_direction))
+        hit(p, q, opposite(p_direction))
     elif p.attack and not q.attack:
-        hit(q, p_direction)
+        hit(q, q, p_direction)
 
 def opposite(direction):
     if direction == 'down':
@@ -167,7 +201,7 @@ def opposite(direction):
     else:
         return None
 
-def hit(p, direction, mega=False):
+def hit(p, q, direction, mega=False):
     if p.health > health_reduction:
         p.health -= health_reduction
     else:
@@ -183,6 +217,7 @@ def hit(p, direction, mega=False):
         p.velX -= amount
     if direction == 'right':
         p.velX += amount
+    p.last_hit_by = q
 
 def handle_wall_collision(wall, p):
     if p.velY < 0: # going up
@@ -236,6 +271,12 @@ def get_data_to_send_to_client(p):
 def send_state():
     while True:
         simple_players = list(map(get_data_to_send_to_client, players))
+        data = {
+            'state': state,
+            'players': simple_players,
+            'time': game_time,
+            'map index': map_index
+        }
         message = {'title':'update state', 'data':simple_players} # for now lets just send the players instead of state
         send_message(message)
         time.sleep(sleep_amount)

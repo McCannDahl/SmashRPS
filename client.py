@@ -92,12 +92,12 @@ class Display:
     
     def got_data(self, data):
         if data['title'] == 'update state':
-            self.current_page.update_state(data['data'])
-        elif data['title'] == 'start game':
             data = data['data']
-            map = maps[data['map index']]
-            self.current_page = self.pages[3] # game
-            self.current_page.set_map(map)
+            if data['state'] == 1 and self.current_page != self.pages[3]:
+                self.current_page = self.pages[3]
+                map = maps[data['map index']]
+                self.current_page.set_map(map)
+            self.current_page.update_state(data)
 
     def join(self, ip):
         self.socket.connect(ip)

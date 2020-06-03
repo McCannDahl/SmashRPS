@@ -46,3 +46,5 @@ attack_total_time = 0.5
 hit_amount = 200
 hit_multiplyer = 2
 health_reduction = 0.1
+
+final_game_time = 60 * 2

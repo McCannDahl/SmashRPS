@@ -61,7 +61,7 @@ class Game(Page):
 
     def render(self):
         self.render_map()
-        for p in self.state:
+        for p in self.players:
             self.render_person(p)
         
     def render_map(self):

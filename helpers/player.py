@@ -30,6 +30,9 @@ class Player:
         self.left = False
         self.right = False
         self.on_ground = False
+        self.last_hit_by = None
+        self.kills = 0
+        self.deaths = 0
 
     def disconnected(self):
         self.action({
@@ -129,5 +132,12 @@ class Player:
             'w': self.w,
             'h': self.h,
             'ready': self.ready,
-            'health': self.health
+            'health': self.health,
+            'deaths': self.deaths,
+            'kills': self.kills
         }
+    
+    def die(self):
+        if self.last_hit_by:
+            self.last_hit_by.kills += 1
+        self.deaths += 1
