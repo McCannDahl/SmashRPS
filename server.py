@@ -355,3 +355,11 @@ if __name__ == '__main__':
     while True:
         time.sleep(10)
 
+
+
+def application(environ, start_response):
+    Thread(target=listen_for_connections, args=[], kwargs=None, daemon=True).start()
+    Thread(target=update, args=[], kwargs=None, daemon=True).start()
+    Thread(target=send_state, args=[], kwargs=None, daemon=True).start()
+    while True:
+        time.sleep(10)
