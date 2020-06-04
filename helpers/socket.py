@@ -53,8 +53,11 @@ class Socket:
                         new = new.split("<<<")[-2]
                     new = new.replace('>>>','')
                     # print(teststr)
-                    test = json.loads(new)
-                    self.got_data(test)
+                    try:
+                        test = json.loads(new)
+                        self.got_data(test)
+                    except Exception as err:
+                        print(teststr)
             except Exception as err:
                 print(teststr)
                 print(new)
