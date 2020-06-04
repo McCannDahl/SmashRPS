@@ -10,13 +10,13 @@ class Game(Page):
         self.ax = 0
         self.ay = 0
     
-        self.img_s = pygame.image.load('images/s.png')
+        self.img_s = pygame.image.load('s.png')
         self.img_s = pygame.transform.scale(self.img_s, (20, 20))
-        self.img_r = pygame.image.load('images/r.png')
+        self.img_r = pygame.image.load('r.png')
         self.img_r = pygame.transform.scale(self.img_r, (20, 20))
-        self.img_p = pygame.image.load('images/p.png')
+        self.img_p = pygame.image.load('p.png')
         self.img_p = pygame.transform.scale(self.img_p, (20, 20))
-        self.img_crown = pygame.image.load('images/crown.png')
+        self.img_crown = pygame.image.load('crown.png')
         self.img_crown = pygame.transform.scale(self.img_crown, (30, 24))
 
     def handle_keydown(self, key):

@@ -63,9 +63,15 @@ def setup_players_positions():
     pass
 
 def disconnected(player):
+    global state, game_time, map_index, playing
     if player in players:
         print('Removing player '+str(player.name))
         players.remove(player)
+    if len(players) == 0:
+        state = 0
+        game_time = 0
+        map_index = 0
+        playing = False
 
 def update():
     new_time = time.time()

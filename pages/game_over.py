@@ -12,7 +12,7 @@ class GameOver(Page):
         self.button_y = 0
         self.button_w = 170
         self.button_h = 50
-        self.img_crown = pygame.image.load('images/crown.png')
+        self.img_crown = pygame.image.load('crown.png')
         self.img_crown = pygame.transform.scale(self.img_crown, (20, 15))
 
     def handle_keydown(self, key):
