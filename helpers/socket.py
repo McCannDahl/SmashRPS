@@ -42,22 +42,21 @@ class Socket:
 
     def get_data(self):
         while self.isconnected:
-            teststr = ''
+            teststr = 'teststr is not set'
+            new = 'new is not set'
             try:
                 teststr = self.sock.recv(1024).decode("utf-8")
                 new = teststr
-                if '<<<' in new and '>>>' in new:
-                    if new.endswith('>>>'): # last message is complete
-                        new = new.split("<<<")[-1]
-                    else: # last message is incomplete
-                        new = new.split("<<<")[-2]
-                    new = new.replace('>>>','')
-                    # print(teststr)
-                    try:
-                        test = json.loads(new)
-                        self.got_data(test)
-                    except Exception as err:
-                        print(teststr)
+                if '>>>' in new:
+                    new = new.split(">>>")[-2]
+                    if '<<<' in new:
+                        new = new.replace('<<<','')
+                        # print(teststr)
+                        try:
+                            test = json.loads(new)
+                            self.got_data(test)
+                        except Exception as err:
+                            print(teststr)
             except Exception as err:
                 print(teststr)
                 print(new)
