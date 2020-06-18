@@ -9,7 +9,7 @@ from helpers.constants import *
 import random
 
 serversocket = socket.socket()
-host = ''
+host = '0.0.0.0'
 port = 54545
 players = []  # array of player colors, postions, attacks, health
 playing = False
