@@ -6,6 +6,8 @@
 3) once installed, go to the installed location and run 'client.exe'
 4) type server ip address
 
+![Image](picture.PNG)
+
 ## server
 1) run `python3 server.py`
 2) make sure port 54545 is open
