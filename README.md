@@ -1,5 +1,7 @@
 # Smash Rock Paper Scissors
 
+Super Smash Brothers like game where players jump around. To attack they can use rock (f), paper (d), or scissors (s).
+
 ## client
 1) download this repository
 2) run the installer located in the 'dist' folder
