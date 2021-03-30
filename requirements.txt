@@ -12,7 +12,7 @@ olefile==0.46
 Pillow==7.1.2
 pycparser==2.20
 pygame==1.9.6
-Pygments==2.6.1
+Pygments==2.7.4
 pylint==2.5.0
 pymunk==4.0.0
 six==1.14.0
